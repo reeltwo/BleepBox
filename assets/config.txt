@@ -1,0 +1,505 @@
+------------------------------
+-- Stealth configuration START
+------------------------------
+$config stealth
+-- Auxiliary strings
+a=TWOLEGS
+a=THREELEGS
+
+-- Servo channels
+s=1,0,180,90,8,0,16,0,1200,1800
+s=2,0,180,90,6,0,8,1,800,2200
+s=3,0,180,90,6,0,20,0
+--s=4,0,180,90,6,0,20,0
+--s=5,0,180,90,10,0,50,0
+s=6,0,180,90,10,0,50,0
+
+-- Initial volume
+volume=50
+-- Play startup sound when system boots
+startup=y
+-- Play random sounds
+rndon=y
+-- Enable acknowledgement sounds (ack, 1, 2, 3) for acknowledgement events
+ackon=y
+-- Gesture to toggle acknowledgement sounds on/off
+ackgest=252
+--acktype=gdas
+--[g=gesture start], [s=slow-mode], [d=joystick], [a=auto-dome], [r=random]
+acktype=das
+-- Min delay before playing next random sound (seconds)
+mindelay=10
+-- Max delay before playing next random sound (seconds)
+maxdelay=120
+-- Stealth controller Receiver's unique i2c address
+myi2c=0
+-- How many channels does the RC radio have
+rcchn=6
+
+-- Sound banks (number of files in sound bank gets automatically populated)
+sb=gen
+sb=chat
+sb=sad
+sb=raspb
+sb=whis
+sb=scream
+sb=warn
+sb=short
+sb=leia
+sb=vader
+sb=sw
+sb=dance
+sb=cant
+
+-- Button command mapping - specify soundbank by name
+b=1,1,$sad
+b=2,1,$raspb
+b=3,1,$warn
+b=4,1,$short
+b=5,1,$chat
+b=6,1,$whis
+b=7,1,$scream
+b=8,1,$chat
+rnd=3
+
+--Gesture
+-- #play sb1 vader,cant,sw,leia,short,raspb
+g=5,1,$gen
+--Gesture
+-- #play sb9 ?
+g=2,1,$leia
+--Gesture
+-- #play sb10 ?
+g=4,1,$vader
+--Gesture
+g=6,1,$sw
+--Gesture
+g=454,1,$dance
+--Gesture
+-- #g=858,1,$cant
+--Gesture
+g=656,6,99,$TWOLEGS
+--Gesture
+g=858,6,99,$THREELEGS
+
+--Enable goslow
+goslow=y
+--Gesture to toggle slowmode
+slowgest=8
+
+--Joystick1 (right) vertical adjust. Subtracted from min/max range. Increases sensitivity.
+j1adjv=14
+--Joystick1 (right) horizontal adjust.  Subtracted from min/max range.. Increases sensitivity.
+j1adjh=16
+
+--Dome home position (180-360)
+domehome=180
+--Gesture to switch auto-dome modes
+domegest=252
+
+----------------------------
+-- Stealth configuration END
+----------------------------
+$config
+
+-- RTTTL songs
+JamesBon:d=4,o=5,b=80:[chat-2-1,32p,16c#6,32d#6,32d#6,16d#6,8d#6,16c#6,16c#6,16c#6,16c#6,32e6,32e6,16e6,8e6,16d#6,16d#6,16d#6,16c#6,32d#6,32d#6,16d#6,8d#6,16c#6,16c#6,16c#6,16c#6,32e6,32e6,16e6,8e6,16d#6,16d6,16c#6,[chat-1-0,16c#7,c.7,16g#6,16f#6,g#.6
+Thunderb:d=16,o=5,b=125:8g#,f,g#,4a#,8p,d#,f,8g#,8a#,8d#6,f6,c6,8d#6,8f6,2a#,8g#,f,g#,4a#,8p,d#,f,8g#,8a#,8d#6,f6,c6,8d#6,8f6,2g6,8g6,a6,e6,4g6,8p,e6,d6,8c6,8b,8a,b,8c6,8e6,2d6
+Pacman:d=32,o=5,b=112:[0:37,32p,b,p,b6,p,f#6,p,d#6,p,b6,f#6,16p,16d#6,16p,c6,p,c7,p,g6,p,e6,p,c7,g6,16p,16e6,16p,b,p,b6,p,f#6,p,d#6,p,b6,f#6,16p,16d#6,16p,d#6,e6,f6,p,f6,f#6,g6,p,g6,g#6,a6,p,b.6
+BeverlyH:d=16,o=5,b=225:[1,4f,4p,4g#,8p,4f,8f,4a#,32p,4f,4d#,4f,4p,4c6,8p,4f,8f,4c#6,32p,4c6,4g#,4f,4c6,4f6,8f,4d#,8d#,32p,4c,4g,1f  
+rickastl:d=4,o=5,b=120:[,16c,16d,16f,16d,16a.,16p,32p,8a,16p,g.,16c,16d,16f,16d,16g.,16p,32p,8g,16p,8f.,16e,8d,16c,16d,16f,16d,f,8g,8e.,16d,8c,8c4,8c,8g,8p,2f,16c,16d,16f,16d,16a.,16p,32p,8a,16p,g.,16c,16d,16f,16d,c6,8e,8f.,16e,8d,16c,16d,16f,16d,f,8g,8e.,16d,8c,8c4,8c,8g,8p,2f
+ATeam:d=4,o=5,b=125:8f.6,16f6,8c6,2f6,8p,8a#,c6,2f,16a#,16c6,8f6,8c6,8g6,2f6,8p,8d#.6,16d6,16c6,a#,2c6,8f.6,16f6,8c6,2f6,8p,8a,a#,8c6,2f,8a#,8a,8p,8f,a#,a,a#,a,8f,g.,f,c6,a#,d#6,2f6,8f,
+Voyager:d=4,o=6,b=140:[whis-4-1,29c#,2f#5,2f#,f,c#,c#,d#,d#,c#,2a#,f#,8p,8d#,8c#,8f#5,2f#5,8p,8c#,8g#5,8c#5,2c#5,g#5,1f#5,8p,2f#5,g#5,a#5,b5,c#,d,e,2f#,b5,f#,1g,2f#,b5,f#,2g,b5,g,2g#.,a#,2g#,2c#
+StarTrekTNG:d=32,o=6,b=63:8f#.5,b.5,d#.,8c#.,a.5,g#.,4f#.,a.5,e.,f#.,g#.,e.,8d#,8c#,8b.5,d#.,b.5,2c#.
+The Simpsons:d=4,o=5,b=160:[0:0,c.6,e6,f#6,8a6,g.6,e6,c6,8a,8f#,8f#,8f#,2g,8p,8p,8f#,8f#,8f#,8g,a#.,8c6,8c6,8c6,c6
+StarTrekOrig:d=32,o=5,b=40:8f#,8e.6,16d#6,c#.6,b.,a#.,4a,16g.,8f#,8f#.6,16e6,d#.6,c#.6,b.,4a#,16a,8g#.,16a#,16b,c#.6,d#.6,e6,d#.6,4f#6,8a.6,16g#6,8f#6,4g#,8c#6,2b.
+Star Trek:d=4,o=5,b=63:8f.,16a#,d#.6,8d6,16a#.,16g.,16c.6,f6
+TrekTOS2longAtEnd:d=32,o=5,b=40:8f#,8e.6,16d#6,c#.6,b.,a#.,4a,16g.,8f#,8f#.6,16e6,d#.6,c#.6,b.,4a#,16a,8g#.,16a#,16b,c#.6,d#.6,e6,d#.6,4f#6,8a.6,16g#6,8f#6,4g#,8c#6,2b.
+TrekChirpX3:d=32,o=7,b=180:d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f,2p,d#,e,g,d#,g,d#,f#,e,f
+SWmainOkay:d=4,o=5,b=180:8f,8f,8f,2a#.,2f.6,8d#6,8d6,8c6,2a#.6,f.6,8d#6,8d6,8c6,2a#.6,f.6,8d#6,8d6,8d#6,2c6,p,8f,8f,8f,2a#.,2f.6,8d#6,8d6,8c6,2a#.6,f.6,8d#6,8d6,8c6,2a#.6,f.6,8d#6,8d6,8d#6,2c6
+SWmainRepetitive:d=4,o=5,b=45:[sad-1-0,32p,32f#,32f#,32f#,8b.,8f#.6,32e6,32d#6,32c#6,8b.6,16f#.6,32e6,32d#6,32c#6,8b.6,16f#.6,32e6,32d#6,32e6,8c#.6,32f#,32f#,32f#,8b.,8f#.6,32e6,32d#6,32c#6,8b.6,16f#.6,32e6,32d#6,32c#6,8b.6,16f#.6,32e6,32d#6,32e6,8c#6
+SWforce:d=4,o=5,b=225:2c,1f,2g.,8g#,8a#,1g#,2c.,c,2f.,g,g#,c,8g#.,8c.,8c6,1a#.,2c,2f.,g,g#.,8f,c.6,8g#,1f6,2f,8g#.,8g.,8f,2c6,8c.6,8g#.,8f,2c,8c.,8c.,8c,2f,8f.,8f.,8f,2f
+SWCantina:d=4,o=5,b=250:[sad-1-0,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8d6,8p,8a,8p,8g#,a,8a,8g#,8a,g,8f#,8g,8f#,f.,8d.,16p,p.,8a,8p,8d6,8p,8a,8p,8d6,8p,8a,8d6,8p,8a,8p,8g#,8a,8p,8g,8p,g.,8f#,8g,8p,8c6,a#,a,g
+SWmarchFastFull:d=4,o=5,b=112:8g,16p,8g,16p,8g,16p,16d#.,32p,32a#.,8g,16p,16d#.,32p,32a#.,g,8p,32p,8d6,16p,8d6,16p,8d6,16p,16d#.6,32p,32a#.,8f#,16p,16d#.,32p,32a#.,g,8p,32p,8g6,16p,16g.,32p,32g.,8g6,16p,16f#.6,32p,32f.6,32e.6,32d#.6,16e6,8p,16g#,32p,8c#6,16p,16c.6,32p,32b.,32a#.,32a.,16a#,8p,16d#,32p,8f#,16p,16d#.,32p,32g.,8a#,16p,16g.,32p,32a#.,d6,8p,32p,8g6,16p,16g.,32p,32g.,8g6,16p,16f#.6,32p,32f.6,32e.6,32d#.6,16e6,8p,16g#,32p,8c#6,16p,16c.6,32p,32b.,32a#.,32a.,16a#,8p,16d#,32p,8f#,16p,16d#.,32p,32g.,8g,16p,16d#.,32p,32a#.,g
+
+SWmarchLowGoodFull:d=4,o=5,b=80:[whis-4-1,8d.,8d.,8d.,8a#4,16f,8d.,8a#4,16f,d.,32p,8a.,8a.,8a.,8a#,16f,8c#.,8a#4,16f,d.,32p,8d.6,8d,16d,8d6,32p,8c#6,16c6,16b,16a#,8b,32p,16d#,8g#,32p,8g,16f#,16f,16e,8f,32p,16a#4,8c#,32p,8a#4,16c#,8f.,8d,16f,a.,32p,8d.6,8d,16d,8d6,32p,8c#6,16c6,16b,16a#,8b,32p,16d#,8g#,32p,8g,16f#,16f,16e,8f,32p,16a#4,8c#,32p,8a#4,16f,8d.,8a#4,16f,d.
+SWmarchLowGoodFull2:d=4,o=5,b=80:[whis-4-1,8d.,8d.,8d.,8a#4,16f,8d.,8a#4,16f,d.,32p,8a.,8a.,8a.,8a#,16f,8c#.,8a#4,16f,d.,32p,8d.6,8d,[fine-1-1,16d,8d6,32p,8c#6,16c6,16b,16a#,8b,32p,16d#,8g#,32p,8g,16f#,16f,16e,8f,32p,16a#4,8c#,32p,8a#4,16c#,8f.,8d,16f,a.,32p,8d.6,8d,16d,8d6,32p,8c#6,16c6,16b,16a#,8b,32p,16d#,8g#,32p,8g,16f#,16f,16e,8f,32p,16a#4,8c#,32p,8a#4,16f,8d.,8a#4,16f,d.,[scream-1-0,S
+
+--Test:d=4,o=5,b=45:[chat-1-0,S,[chat-1-1,S,[chat-1-2,S,[chat-1-3,S,[chat-1-4,S,[chat-1-5,S,[chat-1-6,S,[chat-1-7,S,[chat-1-8,S,
+Test:d=8,o=5,b=225:[chat-1-0,S,[chat-1-1,S,[chat-1-2,S,[chat-1-3,S,[chat-1-4,S,[chat-1-5,S,[chat-1-6,S,[chat-1-7,S,[chat-1-8,S,[chat-1-8,S,Se7,Sd7,Sc7,32p,Sf7,Sf7,Sc7,32p,Se7,Sf7,[chat-1-4,S
+
+Doom:d=8,o=5,b=225:[chat-1-3,S,32p,[chat-1-0,Sc7,Sd7,32p,[warn-2-7,S,[chat-1-0,Se6,Sa6,Sc6,Se6,32p,[warn-2-7,S,[chat-1-0,Se7,Sc7,Sa7,Sc7,[chat-1-1,S
+
+Scale:d=8,o=7,b=200:[chat-1-0,$si,$re,$re,32p,[warn-2-7,S,[chat-1-2,$fa,$so,$fa,$re,[chat-1-5,S
+Bored:d=8,o=7,b=200:[chat-1-4,$re,$si,$la,[chat-1-6,S
+
+my:d=10,o=7,b=200,]warn-1-13,$re8.,[whis-7-12,$do
+fly:d=10,o=5,b=250,[whis-5-7,$fa,[chat-8-4,$re,[whis-5-7,$si6,[chat-4-6,$la7
+ship:d=10,o=6,b=200,[warn-1-10,$fa,[chat-1-7,$so,[whis-6-12,$la7,[chat-1-0,$so7
+full:d=10,o=7,b=250,[chat-2-10,$re,[chat-4-3,$la6,[warn-1-13,$si8,[chat-4-6,$do7
+eels:d=10,o=6,b=200,[chat-5-1,$do,[warn-1-13,$re8,[chat-5-1,$si,[whis-5-7,$so6,[chat-5-1,$si
+
+
+--my:d=10,o=7,b=200,[warn-1-13,$re8.,[whis-7-12,$do,[sad-4-1,S,32p
+--fly:d=10,o=5,b=250,[whis-5-7,$fa,[chat-8-4,$re,[whis-5-7,$si6,[chat-4-6,$la7,[whis-1-6,S
+--ship:d=10,o=6,b=200,[warn-1-10,$fa,[chat-1-7,$so,[whis-6-12,$la7,[chat-1-0,$so7,[warn-1-24,S,32p
+--full:d=10,o=7,b=250,[chat-2-10,$re,[chat-4-3,$la6,[warn-1-13,$si8,[chat-4-6,$do7,[whis-4-2,S
+--eels:d=10,o=6,b=200,[chat-5-1,$do,[warn-1-13,$re8,[chat-5-1,$si,[whis-5-7,$so6,[chat-5-1,$si,[chat-16-1,S
+
+
+-- dome sounds
+--domestart:d=32,o=5,b=2:[dome-1,S,[dome-2,S,S,S,S,S,S
+--domerepeat::[dome-2,S
+--domestop::[dome-3,S
+
+---
+--$play #0,#QUEUE,Voyager
+--$play #2,dome-1
+--$play #2,#QUEUE,#LOOP,dome-2
+
+--$play #2,dome-3
+
+--$play #0,my
+--$play #0,#QUEUE,fly
+--$play #0,#QUEUE,ship
+--$play #0,#QUEUE,full
+--$play #0,#QUEUE,eels
+
+--$play chat-1
+--$play chat-2
+--$play chat-3
+--$play chat-4
+--$play chat-5
+--$play chat-6
+--$play chat-7
+--$play chat-8
+--$play chat-9
+--$play chat-10
+--$play chat-13
+--$play chat-15
+--$play chat-16
+--$play chat-18
+
+--$play fine-1
+
+--$play sad-1
+--$play sad-4
+--$play sad-5
+--$play sad-6
+--$play sad-7
+--$play sad-8
+--$play sad-9
+--$play sad-10
+--$play sad-11
+
+--$play scream-1
+
+--$play warn-1
+--$play warn-2
+--$play whis-1
+--$play whis-2
+--$play whis-3
+--$play whis-4
+--$play whis-5
+--$play whis-6
+--$play whis-7
+--$play whis-8
+--$play whis-9
+
+--lower pitch
+--#t=1.2,#p=-10
+--lower pitch slow
+--#t=1.6,#p=-10
+--lower pitch reverse
+--#t=0.9,#p=-10,#r=1
+--high pitch
+--#t=1,#p=5
+--high pitch fast
+--#t=0.9,#p=5
+--high pitch fast reverse
+--#t=0.75,#p=3,#r=1
+$play startup-1
+
+--$play #QUEUE,gen-1
+--$play #QUEUE,gen-2
+--$play #QUEUE,gen-3
+--$play #QUEUE,gen-4
+--$play #QUEUE,gen-5
+--$play #QUEUE,gen-6
+--$play #QUEUE,gen-7
+--$play #QUEUE,gen-8
+--$play #QUEUE,gen-9
+--$play #QUEUE,gen-10
+--$play #QUEUE,gen-11
+--$play #QUEUE,gen-12
+--$play #QUEUE,gen-13
+--$play #QUEUE,gen-16
+--
+--$play #QUEUE,chat-1
+--$play #QUEUE,chat-2
+--$play #QUEUE,chat-3
+--$play #QUEUE,chat-4
+--$play #QUEUE,chat-5
+--$play #QUEUE,chat-6
+--$play #QUEUE,chat-7
+--$play #QUEUE,chat-8
+--$play #QUEUE,chat-9
+--$play #QUEUE,chat-10
+--$play #QUEUE,chat-13
+--$play #QUEUE,chat-15
+--$play #QUEUE,chat-16
+--$play #QUEUE,chat-18
+--
+--$play #QUEUE,fine-1
+--$play #QUEUE,sad-1
+--$play #QUEUE,sad-4
+--$play #QUEUE,sad-5
+--$play #QUEUE,sad-6
+--$play #QUEUE,sad-7
+--$play #QUEUE,sad-8
+--$play #QUEUE,sad-9
+--$play #QUEUE,sad-10
+--$play #QUEUE,sad-11
+--$play #QUEUE,scream-1
+--$play #QUEUE,warn-1
+--$play #QUEUE,warn-2
+--$play #QUEUE,whis-1
+--$play #QUEUE,whis-2
+--$play #QUEUE,whis-3
+--$play #QUEUE,whis-4
+--$play #QUEUE,whis-5
+--$play #QUEUE,whis-6
+--$play #QUEUE,whis-7
+--$play #QUEUE,whis-8
+--$play #QUEUE,whis---
+
+-- MARCDUINO COMMAND MAPPING
+
+-- GEN SOUNDS 1
+$marc $11,gen-1
+$marc $12,gen-2
+$marc $13,gen-3
+$marc $14,gen-4
+$marc $15,gen-5
+$marc $16,gen-6
+$marc $17,gen-7
+$marc $18,gen-8
+$marc $19,gen-9
+$marc $110,gen-10
+$marc $111,gen-11
+
+-- GEN SOUNDS 2
+$marc $112,gen-12
+$marc $113,gen-13
+$marc $114,gen-16
+$marc $115,overhere-1
+$marc $116,proc-1
+$marc $117,warn-1
+$marc $118,warn-2
+$marc $119,fine-1
+$marc $120,fine-2
+$marc $121,fine-3
+$marc $122,ack-1
+
+-- CHAT SOUNDS 1
+$marc $21,chat-1
+$marc $22,chat-2
+$marc $23,chat-3
+$marc $24,chat-4
+$marc $25,chat-5
+$marc $26,chat-6
+$marc $27,chat-7
+$marc $28,chat-8
+$marc $29,chat-9
+$marc $210,chat-10
+$marc $211,chat-13
+
+-- CHAT SOUNDS 2
+$marc $212,chat-15
+$marc $213,chat-13
+$marc $214,chat-16
+$marc $215,chat-18
+$marc $216,whis-4
+$marc $217,whis-5
+$marc $218,whis-6
+$marc $219,whis-8
+$marc $220,whis-9
+$marc $221,whis-10
+$marc $222,whis-11
+
+-- HAPPY SOUNDS 1
+$marc $31,happy-1
+$marc $32,happy-2
+$marc $33,happy-3
+$marc $34,hum-1
+$marc $35,hum-25
+$marc $36,hum-3
+$marc $37,hum-4
+$marc $38,hum-5
+$marc $39,hum-6
+$marc $310,hum-8
+$marc $311,hum-11
+
+-- HAPPY SOUNDS 2
+$marc $312,hum-12
+$marc $313,hum-13
+$marc $314,hum-14
+$marc $315,hum-15
+$marc $316,hum-16
+$marc $317,hum-18
+$marc $318,hum-20
+$marc $319,hum-21
+$marc $320,hum-24
+$marc $321,hum-23
+$marc $322,wow-1
+
+-- SAD SOUNDS 1
+$marc $41,sad-1
+$marc $42,sad-4
+$marc $43,sad-5
+$marc $44,sad-6
+$marc $45,sad-7
+$marc $46,sad-8
+$marc $47,sad-9
+$marc $48,sad-10
+$marc $49,sad-11
+$marc $410,razz-1
+$marc $411,razz-2
+
+-- SAD SOUNDS 2
+$marc $412,razz-3
+$marc $413,razz-4
+$marc $414,razz-5
+$marc $415,razz-6
+$marc $416,razz-7
+$marc $417,razz-8
+$marc $418,razz-9
+$marc $419,razz-10
+$marc $420,razz-12
+$marc $421,razz-13
+$marc $422,razz-14
+
+-- WHIS SOUNDS 1
+$marc $51,whis-1
+$marc $52,whis-2
+$marc $53,whis-3
+$marc $54,whist-1
+$marc $55,whist-2
+$marc $56,whist-3
+$marc $57,whist-4
+$marc $58,whist-5
+$marc $59,whist-6
+$marc $510,whist-7
+$marc $511,whist-8
+
+-- WHIST SOUNDS 2
+$marc $512,whist-9
+$marc $513,whist-10
+$marc $514,whist-11
+$marc $515,whist-12
+$marc $516,whist-13
+$marc $517,whist-14
+$marc $518,whist-15
+$marc $519,whist-16
+$marc $520,whist-17
+$marc $521,whist-18
+$marc $522,whist-19
+
+-- SCREAM SOUNDS 1
+$marc $61,scream-1
+$marc $62,annoy-1
+$marc $63,scream-4
+$marc $64,alarm-1
+$marc $65,alarm-2
+$marc $66,alarm-3
+$marc $67,alarm-4
+$marc $68,alarm-5
+$marc $69,alarm-6
+$marc $610,alarm-7
+$marc $611,alarm-8
+
+-- SCREAM SOUNDS 2
+$marc $612,alarm-9
+$marc $613,alarm-10
+$marc $614,alarm-11
+$marc $615,ooh-1
+$marc $616,ooh-2
+$marc $617,ooh-3
+$marc $618,ooh-4
+$marc $619,ooh-6
+$marc $620,ooh-7
+$marc $621,rude-1
+$marc $622,#LOOP,cylon-1
+$marc $623,scream-3
+
+-- LEIA SOUNDS 1
+$marc $71,leia-hologram-cleaned-amped-up
+$marc $72,leia-help
+$marc $73,Leia
+$marc $74,LeiaR2
+$marc $75,LeiaShortTrooper
+$marc $76,LeiaWalkingCarpet
+$marc $77,LeiaFoulStench
+$marc $78,LeiaLaserBrain
+$marc $79,LeiaMercenary
+$marc $710,LeiaNerfHerder
+$marc $711,LeiaTalkingAbout
+
+-- LEIA SOUNDS 2
+$marc $712,LeiaBattlestation
+$marc $713,LeiaDoAsITell
+$marc $714,LeiaNotOver
+$marc $715,LeiaDontKnow
+$marc $716,#1,JabbaFlow
+$marc $717,LackOfFaith
+$marc $718,#1,baby_shark
+$marc $719,#1,alien_nostromo_destruct
+$marc $720,YodaClearMind
+$marc $721,YodaNeverForAttack
+$marc $722,YodaNothingMore
+
+-- MUS SOUNDS 1
+$marc $81,#1,cant-1
+$marc $82,#1,sw-1
+$marc $83,#1,vader-1
+$marc $84,#1,Mhana
+$marc $85,#1,AddamsFa
+$marc $86,#1,StayinAl
+$marc $87,#1,birthday
+$marc $88,#1,In_Love
+$marc $89,#1,MachoMan
+$marc $810,#1,Peanut
+$marc $811,#1,UptownFunk
+
+-- MUS SOUNDS 2
+$marc $812,#1,Celebration
+$marc $813,#1,dance-1
+$marc $814,#1,dance-2
+$marc $815,#1,HarlemShake
+$marc $816,#1,Voyager
+$marc $817,#1,SWCantina
+$marc $818,#1,SWmarchLowGoodFull2
+$marc $819,#1,rickastl
+$marc $820,#1,StarTrekOrig
+$marc $821,#1,GirlOnFire
+$marc $822,#1,Pacman
+
+-- LOGIC COMMANDS
+--$marc :SE08,Leia
+--$marc @0T6,Leia
+$marc @0T92,dance-2
+$marc @0T11,vader-1
+$marc @0T5,scream-1
+$marc @0T10,sw-1
+
+-- SOUND OFF COMMAND
+$marc :SE10,$sa
+$marc $s,$sa
+
+-- Abbreviate Marcs
+$marc $c,#1,dance-1
+$marc $C,#1,dance-3
+$marc $D,#1,dance-2
+$marc $F,scream-3-5
+$marc $L,$73
+$marc $S,scream-1

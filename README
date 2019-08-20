@@ -1,0 +1,18 @@
+
+Mac OSX
+=======
+brew install tio fftw libsamplerate
+
+Linux
+=====
+sudo apt update
+
+sudo apt install libfftw3-dev libsamplerate0-dev libsndfile1-dev
+
+mkdir prereq
+cd prereq
+git clone https://git.aubio.org/aubio/aubio/
+cd aubio
+make
+make install
+sudo rsync -auv build/dist/usr/local/ /usr/local/
