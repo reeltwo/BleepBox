@@ -10,3 +10,7 @@
 .Trashes
 .vs/
 assets/.*.dat
+BleepBox
+build/*
+downloads/*
+libs/*
