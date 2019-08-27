@@ -4,7 +4,7 @@ RUBBERBAND := rubberband-1.8.2
 AUBIO := aubio
 PORTAUDIO := pa_stable_v190600_20161030
 SMQ_CFLAGS := -DHAVE_SMQ -I../smq/src
-SMQ_LDFLAGS :=  -lzmq -luuid -ljson-c -L../smq/lib -lsmq
+SMQ_LDFLAGS := -L../smq/lib -lsmq -lzmq -luuid -ljson-c
 
 ifeq ($(OS),Windows_NT)
     CCFLAGS += -D WIN32

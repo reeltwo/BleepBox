@@ -97,6 +97,8 @@ using namespace RubberBand;
 #define FRAMES_PER_BUFFER  (64)
 #endif
 
+#define SizeOfArray(arr) (sizeof(arr)/sizeof(arr[0]))
+
 extern "C" char* encode_md5(char* buf, ssize_t len);
 
 typedef void* (*pthread_start_proc_t)(void*);
@@ -241,8 +243,9 @@ struct SoundSnippet
     int fUsedIndex;
     const char* fName;
     AudioFile<float>* fAudio;
+    // change this to a dynamic structure
     int fNoteCount;
-    RNote fNotes[20];
+    RNote fNotes[30];
 };
 
 smpl_t lastmidi = 0.;
@@ -278,7 +281,11 @@ static void process_block_notes(SoundSnippet* snippet, aubio_notes_t* notes, uin
         if (rnote->fPitch != 0)
         {
             rnote->fEndSampleTime = time_in_samples;
-            snippet->fNoteCount++;
+            if (snippet->fNoteCount < SizeOfArray(snippet->fNotes))
+            {
+                snippet->fNoteCount++;
+                rnote[1].fPitch = 0;
+            }
         }
         // send_noteon(time_in_samples, lastmidi, 0);
     }
@@ -436,7 +443,6 @@ AudioFile<float>* loadAudio(SoundSnippet* snippet, const char* dir, const char *
                     while (read == hop_size);
 
                     //printf("read %.2fs (%d samples in %d blocks of %d) from %s at %dHz\n", total_read * 1. / samplerate, total_read, blocks, hop_size, path, samplerate);
-
                     // send a last note off if required
                     if (lastmidi)
                     {
@@ -486,8 +492,6 @@ AudioFile<float>* loadAudio(SoundSnippet* snippet, const char* dir, const char *
     }
     return audio;
 }
-
-#define SizeOfArray(arr) (sizeof(arr)/sizeof(arr[0]))
 
 struct StealthSoundBank
 {
@@ -583,7 +587,7 @@ static const char* sScaleDMajor[] = {
 
 static const char* midiNoteToNote(int midiNote)
 {
-    return (midiNote != -1) ? sNotes[midiNote] : "";
+    return (midiNote != -1 && midiNote < SizeOfArray(sNotes)) ? sNotes[midiNote] : "";
 }
 
 static size_t noteToMidiNote(const char* note)
@@ -797,7 +801,7 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
                 //printf("readcount : %d\n", readcount); 
                 if (readcount <= 0)
                 {
-                    free(act->fCacheMixDownBuffer);
+                    delete [] act->fCacheMixDownBuffer;
                     act->fCacheMixDownBuffer = NULL;
                     act->fDone = true;
                     continue;//return paComplete;
@@ -811,7 +815,7 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
                 {
                     printf("act->fInterrupt : %d\n", act->fInterrupt);
                     if (act->fCacheMixDownBuffer != NULL)
-                        free(act->fCacheMixDownBuffer);
+                        delete [] act->fCacheMixDownBuffer;
                     act->fCacheMixDownBuffer = NULL;
                     act->fDone = true;
                     return paComplete;
@@ -859,7 +863,7 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
         else if (act->fStretcher != NULL && (act->fOutDataAvail = act->fStretcher->available()) > 0)
         {
             if (act->fOutData != NULL)
-                delete act->fOutData;
+                delete [] act->fOutData;
             // printf("READ : %d [%d] dofinal=%d\n", act->fOutDataAvail, act->fOutDataRead, dofinal);
             act->fOutData = new float[act->fOutDataAvail];
             act->fStretcher->retrieve((float**)&act->fOutData, act->fOutDataAvail);
@@ -1108,6 +1112,7 @@ static void StreamPlayTime(AudioChannelThread* act, long duration)
         float* buffer_end = buffer + sampleCount;
         float* bufferp = buffer;
 
+        memset(buffer, '\0', bufSize);
         while (bufferp < buffer_end)
         {
             unsigned long framesPerBuffer = (buffer_end - bufferp < FRAMES_PER_BUFFER) ? buffer_end - bufferp : FRAMES_PER_BUFFER;
@@ -1534,7 +1539,7 @@ void playRTTTLSequence(AudioChannelThread* act, const char *p, int octaveOffset)
             act->fFadeOutValue = 0;
             if (act->fOutData != NULL)
             {
-                delete act->fOutData;
+                delete [] act->fOutData;
                 act->fOutData = NULL;
             }
             if (act->fStretcher != NULL)
@@ -1563,7 +1568,7 @@ void playRTTTLSequence(AudioChannelThread* act, const char *p, int octaveOffset)
             act->fFadeOutValue = 0;
             if (act->fOutData != NULL)
             {
-                delete act->fOutData;
+                delete [] act->fOutData;
                 act->fOutData = NULL;
             }
             if (act->fStretcher != NULL)
