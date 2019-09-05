@@ -91,11 +91,11 @@ typedef pthread_t OSTHREAD_HANDLE;
 using namespace RubberBand;
 
 #define SAMPLE_RATE   (44100)
-#if defined(USE_CACHE)
-#define FRAMES_PER_BUFFER  (4096)
-#else
+// #if defined(USE_CACHE)
+// #define FRAMES_PER_BUFFER  (64)
+// #else
 #define FRAMES_PER_BUFFER  (64)
-#endif
+// #endif
 
 #define SizeOfArray(arr) (sizeof(arr)/sizeof(arr[0]))
 
@@ -535,6 +535,7 @@ struct GlobalState
     double fDeffrequencyshift;
     bool fDefdoreverse;
     bool fQuit;
+    bool fUseCache;
 };
 
 static int random(int max, int min =0) //range : [min, max)
@@ -813,7 +814,7 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
             {
                 if (act->fInterrupt)
                 {
-                    printf("act->fInterrupt : %d\n", act->fInterrupt);
+                    // printf("act->fInterrupt : %d\n", act->fInterrupt);
                     if (act->fCacheMixDownBuffer != NULL)
                         delete [] act->fCacheMixDownBuffer;
                     act->fCacheMixDownBuffer = NULL;
@@ -911,9 +912,16 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
                 act->fSnippetIndex = act->fCmd.fSndIndex;
                 if (act->fNext)
                 {
-                    act->fDone = true;
-                    act->fSilenced = true;
-                    goto reloop;
+                    if (act->fCmd.fLooping)
+                    {
+                        act->fCmd.fSndIndex = act->fCmd.fSndIndexStart; 
+                    }
+                    else
+                    {
+                        act->fDone = true;
+                        act->fSilenced = true;
+                        goto reloop;
+                    }
                 }
                 act->fReverse = act->fCmd.fReverse;
                 sourceSnippet = &act->fData->fSnippets[act->fCatIndex][act->fSnippetIndex];
@@ -1957,6 +1965,12 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                 p++;
             const char* name = p;
             AudioChannelThread* act = &data->fChannels[channelNumber];
+            if (data->fUseCache && !doCache && !doqueue)
+            {
+                // Stop any current audio if using cache and #QUEUE wasn't specified
+                if (act->fCurrentCmd > 0 || (act->fCmd.fCmd != 0 && !act->fCmd.fDone))
+                    sendACT_Stop(act);
+            }
             if (doRecord)
             {
                 while (act->fCurrentCmd > 0 || (act->fCmd.fCmd != 0 && !act->fCmd.fDone))
@@ -1995,44 +2009,44 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                 free(speechName);
                 name = NULL;
             }
-        #ifdef USE_CACHE
-            else if (CheckIfAssetFileExists(name))
+            else if (data->fUseCache)
             {
-            }
-            else if (!CheckIfCachedFileExists(name))
-            {
-                printf("Caching : \"%s\"\n", name);
-                while (act->fCurrentCmd > 0 || (act->fCmd.fCmd != 0 && !act->fCmd.fDone))
+                if (CheckIfAssetFileExists(name))
                 {
-                    Pa_Sleep(200);
                 }
-                memset(&act->fRecordingInfo, 0, sizeof (act->fRecordingInfo));
-                CreateDirectoryIfMissing("cache");
-                size_t recordNameLen = strlen(name) + strlen("cache/.wav") + 1;
-                char* recordName = (char*)malloc(recordNameLen);
-                snprintf(recordName, recordNameLen, "cache/%s.wav", name);
-                act->fRecording = recordName;
-                act->fRecordingInfo.samplerate = SAMPLE_RATE;
-                act->fRecordingInfo.channels = 1;
-                act->fRecordingInfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_16);
-                act->fRecordingFile = NULL;//sf_open(recordName, SFM_WRITE, &act->fRecordingInfo);
-                act->fRecordingPlayAtEnd = !doCache;
-            }
-            else
-            {
-            play_cache:
-                if (doCache)
-                    return;
+                else if (!CheckIfCachedFileExists(name))
+                {
+                    while (act->fCurrentCmd > 0 || (act->fCmd.fCmd != 0 && !act->fCmd.fDone))
+                    {
+                        Pa_Sleep(200);
+                    }
+                    memset(&act->fRecordingInfo, 0, sizeof (act->fRecordingInfo));
+                    CreateDirectoryIfMissing("cache");
+                    size_t recordNameLen = strlen(name) + strlen("cache/.wav") + 1;
+                    char* recordName = (char*)malloc(recordNameLen);
+                    snprintf(recordName, recordNameLen, "cache/%s.wav", name);
+                    act->fRecording = recordName;
+                    act->fRecordingInfo.samplerate = SAMPLE_RATE;
+                    act->fRecordingInfo.channels = 1;
+                    act->fRecordingInfo.format = (SF_FORMAT_WAV | SF_FORMAT_PCM_16);
+                    act->fRecordingFile = NULL;//sf_open(recordName, SFM_WRITE, &act->fRecordingInfo);
+                    act->fRecordingPlayAtEnd = !doCache;
+                }
+                else
+                {
+                play_cache:
+                    if (doCache)
+                        return;
 
-                printf("play cache : %s\n", name);
-                size_t cacheNameLen = strlen(name) + strlen("cache/.wav") + 1;
-                char* cacheName = (char*)malloc(cacheNameLen);
-                snprintf(cacheName, cacheNameLen, "cache/%s.wav", name);
-                sendACT_PlayCache(act, cacheName, doqueue, doloop);
-                free(cacheName);
-                name = NULL;
+                    printf("play cache : %s\n", name);
+                    size_t cacheNameLen = strlen(name) + strlen("cache/.wav") + 1;
+                    char* cacheName = (char*)malloc(cacheNameLen);
+                    snprintf(cacheName, cacheNameLen, "cache/%s.wav", name);
+                    sendACT_PlayCache(act, cacheName, doqueue, doloop);
+                    free(cacheName);
+                    name = NULL;
+                }
             }
-        #endif
             if (name != NULL)
             {
                 for (RTTTLSong* song = data->fSongList; song != NULL; song = song->fNext)
@@ -2060,7 +2074,7 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                         if (catList->fCatIndex == cat)
                         {
                             name = catList->fName;
-                            printf("FOUND CAT : %s\n", name);
+                            // printf("FOUND CAT : %s\n", name);
                             break;
                         }
                     }
@@ -2091,22 +2105,23 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                                 recordName = (char*)malloc(recordNameLen);
                                 snprintf(recordName, recordNameLen, "output/%s.wav", name);
                             }
-                        #ifdef USE_CACHE
-                            else if (!CheckIfCachedFileExists(name))
+                            else if (data->fUseCache)
                             {
-                                size_t recordNameLen = strlen(name) + strlen("cache/.wav") + 1;
-                                recordName = (char*)malloc(recordNameLen);
-                                snprintf(recordName, recordNameLen, "cache/%s.wav", name);
+                                if (!CheckIfCachedFileExists(name))
+                                {
+                                    size_t recordNameLen = strlen(name) + strlen("cache/.wav") + 1;
+                                    recordName = (char*)malloc(recordNameLen);
+                                    snprintf(recordName, recordNameLen, "cache/%s.wav", name);
+                                }
+                                else
+                                {
+                                    act->fRecordingPlayAtEnd = false;
+                                    goto play_cache;
+                                }
                             }
-                            else
-                            {
-                                act->fRecordingPlayAtEnd = false;
-                                goto play_cache;
-                            }
-                        #endif 
                             act->fRecording = recordName;
                         }
-                        printf("FOUND : %s\n", name);
+                        // printf("FOUND : %s\n", name);
                         break;
                     }
                 }
@@ -2617,7 +2632,8 @@ static void threadAudioChannelLoop(void* arg)
     }
     outputParameters.channelCount = 1;       /* stereo output */
     outputParameters.sampleFormat = paFloat32; /* 32 bit floating point output */
-#ifdef USE_CACHE
+#if defined(__ARM_ARCH)
+    // Raspberry Pi needs higher latency
     outputParameters.suggestedLatency = 0.5;
 #else
     outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
@@ -2768,7 +2784,7 @@ static void threadAudioChannelLoop(void* arg)
                         act->fZeroPadCount = 0;
                         act->fSilenced = false;
                         double duration = (double(sfinfo->frames) / sfinfo->samplerate);
-                    #ifdef USE_CACHE
+                    #if defined(__ARM_ARCH)
                         if (duration > 5)
                             duration = 1;
                     #else
@@ -2798,7 +2814,7 @@ static void threadAudioChannelLoop(void* arg)
             }
             case 4:
             {
-                printf("Stream should have stopped\n");
+                // printf("Stream should have stopped\n");
                 break;
             }
             default:
@@ -3483,6 +3499,7 @@ int main(int argc, const char* argv[])
     PaError err;
     bool server = false;
     bool verbose = false;
+    bool playall = false;
     const char* vmusicAgentSerial = NULL;
     const char* serverAgentSerial = NULL;
     const char* stealthAgentSerial = NULL;
@@ -3500,6 +3517,9 @@ int main(int argc, const char* argv[])
     memset(&data, '\0', sizeof(data));
 
     initPlatform();
+#ifdef USE_CACHE
+    data.fUseCache = true;
+#endif
     for (int ai = 1; ai < argc; ai++)
     {
         const char* opt = argv[ai];
@@ -3514,6 +3534,16 @@ int main(int argc, const char* argv[])
             else if (strcmp(opt, "s") == 0 || strcmp(opt, "server") == 0)
             {
                 server = true;
+                continue;
+            }
+            else if (strcmp(opt, "playall") == 0)
+            {
+                playall = true;
+                continue;
+            }
+            else if (strcmp(opt, "c") == 0 || strcmp(opt, "cache") == 0)
+            {
+                data.fUseCache = true;
                 continue;
             }
             else if (strncmp(opt, "smq=", 4) == 0)
@@ -4001,7 +4031,7 @@ int main(int argc, const char* argv[])
             }
         }
 
-#ifdef USE_CACHE
+        if (data.fUseCache)
         {
             char cmdbuffer[1024];
             if (verbose)
@@ -4036,7 +4066,53 @@ int main(int argc, const char* argv[])
                 }
             }
         }
-#endif
+        if (playall)
+        {
+            char cmdbuffer[1024];
+            if (verbose)
+                printf("Playing all assets\n");
+            // for (RTTTLSong* song = data.fSongList; song != NULL; song = song->fNext)
+            // {
+            //     snprintf(cmdbuffer, sizeof(cmdbuffer), "$play %s", song->fName);
+            //     printf("%s\n", cmdbuffer);
+            //     processCommand(&data, cmdbuffer, verbose);
+            // }
+            char snippetname[1024];
+            *snippetname = '\0';
+            for (SoundCategory* catList = data.fCategoryList; catList != NULL; catList = catList->fNext)
+            {
+                for (size_t i = 0; i < catList->fCount; i++)
+                {
+                    SoundSnippet* snippet = &catList->fSnippets[i];
+                    snprintf(cmdbuffer, sizeof(cmdbuffer), "%s", snippet->fName);
+                    char*  le = cmdbuffer + strlen(cmdbuffer);
+                    while (le > cmdbuffer)
+                    {
+                        char ch = *le;
+                        *le-- = 0;
+                        if (ch == '-')
+                            break;
+                    }
+                    if (strcmp(snippetname, cmdbuffer) != 0)
+                    {
+                        strcpy(snippetname, cmdbuffer);
+                        snprintf(cmdbuffer, sizeof(cmdbuffer), "$play %s", snippetname);
+                        printf("%s\n", cmdbuffer);
+                        processCommand(&data, cmdbuffer, verbose);
+                    }
+                }
+            }
+            // Wait for completion
+            AudioChannelThread* act = &data.fChannels[0];
+            while (act->fCurrentCmd > 0 || (act->fCmd.fCmd != 0 && !act->fCmd.fDone))
+            {
+                Pa_Sleep(200);
+            }
+            snprintf(cmdbuffer, sizeof(cmdbuffer), "$quit");
+            processCommand(&data, cmdbuffer, verbose);
+            printf("DONE\n");
+            goto doexit;
+        }
         if (vmusicAgentSerial != NULL)
         {
             data.fVMusicPort = vmusicAgentSerial; 
@@ -4108,6 +4184,7 @@ int main(int argc, const char* argv[])
             processCommands(&data, stdin, verbose);
         }
     }
+doexit:
 #ifndef _MSC_VER
     for (size_t ci = 0; ci < data.fChannelCount; ci++)
     {
