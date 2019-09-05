@@ -2885,6 +2885,12 @@ static unsigned int getMyBroadcastIP()
     return addr;
 }
 
+#if defined(__ARM_ARCH)
+const char* amixerDevice = "Speaker";
+#else
+const char* amixerDevice = "PCM";
+#endif
+
 static void MARC_eventHandler(const char* topic_name, const uint8_t* msg, size_t len, void* arg)
 {
     GlobalState* data = (GlobalState*)arg;
@@ -2910,17 +2916,21 @@ static void MARC_eventHandler(const char* topic_name, const uint8_t* msg, size_t
                     }
                 }
             #if defined(__linux)
+                char cmdbuf[256];
                 if (strcmp(marccmd, "$+") == 0)
                 {
-                    system("amixer set PCM 2dB+");
+                    snprintf(cmdbuf, sizeof(cmdbuf), "amixer set %s 2dB+", amixerDevice);
+                    system(cmdbuf);
                 }
                 else if (strcmp(marccmd, "$m") == 0)
                 {
-                    system("amixer set PCM 50%");
+                    snprintf(cmdbuf, sizeof(cmdbuf), "amixer set %s 50%", amixerDevice);
+                    system(cmdbuf);
                 }
                 else if (strcmp(marccmd, "$-") == 0)
                 {
-                    system("amixer set PCM 2dB-");
+                    snprintf(cmdbuf, sizeof(cmdbuf), "amixer set %s 2dB-", amixerDevice);
+                    system(cmdbuf);
                 }
             #endif
             }
@@ -3286,7 +3296,7 @@ static void threadVMusicServerLoop(void* arg)
                         int volume = unsigned(cmd[0]);
                         volume = ((100 - volume) * 100) / 100;
                     #if defined(__linux)
-                        snprintf(path, sizeof(path), "amixer set PCM %d%%", volume);
+                        snprintf(path, sizeof(path), "amixer set %s %d%%", amixerDevice, volume);
                         system(path);
                     #endif
                     }
@@ -3550,6 +3560,11 @@ int main(int argc, const char* argv[])
             {
                 server = true;
                 serverAgentSerial = opt+4;
+                continue;
+            }
+            else if (strncmp(opt, "amixer=", 7) == 0)
+            {
+                amixerDevice = opt+7;
                 continue;
             }
             else if (strncmp(opt, "stealth=", 8) == 0)
