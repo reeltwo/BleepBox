@@ -2,7 +2,9 @@ TARGET := BleepBox
 PLATFORM_LDFLAGS := 
 RUBBERBAND := rubberband-1.8.2
 AUBIO := aubio
+JOBS :=
 PORTAUDIO := pa_stable_v190600_20161030
+#PORTAUDIODBG := --enable-debug-output
 SMQ_CFLAGS := -DHAVE_SMQ -I../smq/src
 SMQ_LDFLAGS := -L../smq/lib -lsmq -lzmq -luuid -ljson-c
 
@@ -67,7 +69,7 @@ build/$(RUBBERBAND): downloads/$(RUBBERBAND).tar.bz2
 
 build/$(RUBBERBAND)/lib/librubberband.a: build/$(RUBBERBAND)
 	mkdir -p build/$(RUBBERBAND)/lib
-	cd build/$(RUBBERBAND) ; ./configure ; make -j 4 static
+	cd build/$(RUBBERBAND) ; ./configure ; make $(JOBS) static
 
 build/$(AUBIO):
 	mkdir -p build
@@ -81,7 +83,7 @@ build/portaudio: downloads/$(PORTAUDIO).tgz
 	tar -m -C build/ -xvf downloads/$(PORTAUDIO).tgz
 
 build/portaudio/lib/.libs/libportaudio.a: build/portaudio
-	cd build/portaudio ; ./configure --disable-mac-universal --without-jack ; make -j 4
+	cd build/portaudio ; ./configure $(PORTAUDIODBG) --disable-mac-universal --without-jack ; make $(JOBS)
 
 libs/librubberband.a: build/$(RUBBERBAND)/lib/librubberband.a
 	mkdir -p libs

@@ -7,7 +7,7 @@ Linux
 =====
 sudo apt update
 
-sudo apt install libfftw3-dev libsamplerate0-dev libsndfile1-dev
+sudo apt install libasound-dev libfftw3-dev libsamplerate0-dev libsndfile1-dev vorbis-tools vamp-plugin-sdk
 
 mkdir prereq
 cd prereq
