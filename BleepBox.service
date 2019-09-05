@@ -4,12 +4,12 @@ Description=RSeries BleepBox Service
 [Service]
 User=pi
 Group=pi
-WorkingDirectory=/home/pi/reeltwo/R2D2/BleepBox
-ExecStart=/home/pi/reeltwo/R2D2/BleepBox/BleepBox -v -s -stealth=/dev/ttyUSB2 -vmusic=/dev/ttyUSB1
+WorkingDirectory=/home/pi/reeltwo/BleepBox
+ExecStart=/home/pi/reeltwo/BleepBox/BleepBox -v -s -stealth=/dev/ttyUSB1 -vmusic=/dev/ttyUSB0
 StandardOutput=syslog
 StandardError=syslog
 SyslogIdentifier=BleepBox
 Restart=always
 
 [Install]
-
+WantedBy=multi-user.target
