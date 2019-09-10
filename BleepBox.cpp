@@ -22,6 +22,7 @@ int getline(char** lineptr, size_t* n, FILE* fp);
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <netdb.h>
+typedef unsigned long long UInt64;
 #endif
 
 #ifdef HAVE_SMQ
@@ -34,6 +35,7 @@ int getline(char** lineptr, size_t* n, FILE* fp);
 #if defined(__linux)
 #include <dlfcn.h>
 #include "pa_linux_alsa.h"
+#define HAVE_CLOCK_REALTIME
 #endif
 #include "aubio.h"
 #include "rubberband/RubberBandStretcher.h"
@@ -49,6 +51,7 @@ int getline(char** lineptr, size_t* n, FILE* fp);
 #include <mach/task.h>
 #include <mach/semaphore.h>
 #define NULL_SEMAPHORE ((semaphore_t)0)
+#define HAVE_CLOCK_REALTIME
 #elif defined(_MSC_VER)
 #else
 #include <semaphore.h>
@@ -788,6 +791,15 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
         }
         if (act->fCacheFile != NULL)
         {
+            if (act->fInterrupt)
+            {
+                // printf("act->fInterrupt : %d\n", act->fInterrupt);
+                if (act->fCacheMixDownBuffer != NULL)
+                    delete [] act->fCacheMixDownBuffer;
+                act->fCacheMixDownBuffer = NULL;
+                act->fDone = true;
+                return paComplete;
+            }
             if (act->fCacheMixDownBuffer == NULL)
             {
                 act->fCacheMixDownBuffer = new float[act->fCacheInfo.channels * 32768];
@@ -812,15 +824,15 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
             }
             else
             {
-                if (act->fInterrupt)
-                {
-                    // printf("act->fInterrupt : %d\n", act->fInterrupt);
-                    if (act->fCacheMixDownBuffer != NULL)
-                        delete [] act->fCacheMixDownBuffer;
-                    act->fCacheMixDownBuffer = NULL;
-                    act->fDone = true;
-                    return paComplete;
-                }
+                // if (act->fInterrupt)
+                // {
+                //     // printf("act->fInterrupt : %d\n", act->fInterrupt);
+                //     if (act->fCacheMixDownBuffer != NULL)
+                //         delete [] act->fCacheMixDownBuffer;
+                //     act->fCacheMixDownBuffer = NULL;
+                //     act->fDone = true;
+                //     return paComplete;
+                // }
                 // printf("%p[%p] channels=%d\n", act->fCacheMixDownPtr, act->fCacheMixDownEnd, act->fCacheInfo.channels);
                 for (int q = 0; q < act->fCacheInfo.channels; q++)
                     *out += *act->fCacheMixDownPtr++;
@@ -904,7 +916,7 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
                     continue;
                 }
             }
-            else if (act->fCmd.fSingleSound)
+            else if (act->fCmd.fSingleSound && !act->fRandom)
             {
                 // printf("HMM act->fStretcher=%p act->fNext=%d\n", act->fStretcher, act->fNext);
                 noshift = true;
@@ -933,8 +945,8 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
                 {
                     if (act->fStretcher == NULL || sampleEnd >= 10000 || random(100) < 50)
                     {
-                        if (act->fStretcher == NULL || random(100) < 4)
-                            act->fCatIndex = random(data->fCategoryCount);
+                        // if (act->fStretcher == NULL || random(100) < 4)
+                        act->fCatIndex = act->fCmd.fCatIndex;
                         act->fSnippetIndex = /*(act->fStretcher != NULL && act->fCatIndex == 0 && random(100) > 10) ? random(11, 0) :*/ random(data->fSnippetCounts[act->fCatIndex]);
                     }
                     AudioFile<float>* nextAudio = data->fSnippets[act->fCatIndex][act->fSnippetIndex].fAudio;
@@ -1102,6 +1114,19 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
     return paContinue;
 }
 
+static UInt64 CurrentTimeMillis()
+{
+    UInt64 millis;
+#if defined(HAVE_CLOCK_REALTIME)
+    timespec tm;
+    clock_gettime(CLOCK_REALTIME, &tm);
+    millis = (UInt64)tm.tv_sec * (UInt64)1000 + (UInt64)tm.tv_nsec / (UInt64)1000000;
+#else
+    #error
+#endif
+    return millis;
+}
+
 /*
  * This routine is called by portaudio when playback is done.
  */
@@ -1135,7 +1160,11 @@ static void StreamPlayTime(AudioChannelThread* act, long duration)
     }
     else
     {
-        Pa_Sleep(duration);
+        UInt64 endTime = CurrentTimeMillis() + duration;
+        while (!act->fInterrupt && CurrentTimeMillis() < endTime)
+        {
+            Pa_Sleep(10);
+        }
     }
 }
 
@@ -1827,6 +1856,7 @@ void processCommand(GlobalState* data, char* line, bool verbose)
 {
     bool doRecord = false;
     bool doCache = false;
+    bool doCreate = false;
     char* p = line;
     while (isspace(*p))
         p++;
@@ -1971,6 +2001,7 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                 if (act->fCurrentCmd > 0 || (act->fCmd.fCmd != 0 && !act->fCmd.fDone))
                     sendACT_Stop(act);
             }
+            act->fRandom = false;
             if (doRecord)
             {
                 while (act->fCurrentCmd > 0 || (act->fCmd.fCmd != 0 && !act->fCmd.fDone))
@@ -2074,7 +2105,6 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                         if (catList->fCatIndex == cat)
                         {
                             name = catList->fName;
-                            // printf("FOUND CAT : %s\n", name);
                             break;
                         }
                     }
@@ -2121,7 +2151,11 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                             }
                             act->fRecording = recordName;
                         }
-                        // printf("FOUND : %s\n", name);
+                        if (doCreate)
+                        {
+                            act->fRandom = true;
+                            printf("FOUND : %s\n", name);
+                        }
                         break;
                     }
                 }
@@ -2135,7 +2169,7 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                     SoundSnippet* snippet = &catList->fSnippets[i];
                     if (strcmp(snippet->fName, name) == 0)
                     {
-                        printf("#channel : %d doloop : %d ratio : %g pitchshift : %g frequencyshift : %g\n", channelNumber, doloop, ratio, pitchshift, frequencyshift);
+                        printf("#channel : %d doloop : %d ratio : %g pitchshift : %g frequencyshift : %g doqueue : %d\n", channelNumber, doloop, ratio, pitchshift, frequencyshift, doqueue);
                         sendACT_PlaySnippet(act, catList->fCatIndex, i, i, octaveOffset, doloop, doqueue, ratio, pitchshift, frequencyshift, doreverse);
                         name = NULL;
                         break;
@@ -2152,7 +2186,7 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                             sndIndexEnd = i++;
                         }
                         printf("%d:[%d-%d]\n", (int)catList->fCatIndex, sndIndex, sndIndexEnd);
-                        printf("#channel : %d doloop : %d ratio : %g pitchshift : %g frequencyshift : %g\n", channelNumber, doloop, ratio, pitchshift, frequencyshift);
+                        printf("#channel : %d doloop : %d ratio : %g pitchshift : %g frequencyshift : %g doqueue : %d\n", channelNumber, doloop, ratio, pitchshift, frequencyshift, doqueue);
                         sendACT_PlaySnippet(act, catList->fCatIndex, sndIndex, sndIndexEnd, octaveOffset, doloop, doqueue, ratio, pitchshift, frequencyshift, doreverse);
                         name = NULL;
                         break;
@@ -2175,6 +2209,16 @@ void processCommand(GlobalState* data, char* line, bool verbose)
             while (isspace(*p))
                 p++;
             doRecord = false;
+            goto play_cmd;
+        }
+        // create command
+        else if (p[1] == 'c' && p[2] == 'r' && p[3] == 'e' && p[4] == 'a' && p[5] == 't' && p[6] == 'e' && isspaceeol(p[7]))
+        {
+            p += 7;
+            while (isspace(*p))
+                p++;
+            doRecord = false;
+            doCreate = true;
             goto play_cmd;
         }
         // cache command
@@ -2721,6 +2765,7 @@ static void threadAudioChannelLoop(void* arg)
                 act->fCmd.fSndIndex = act->fCmd.fSndIndexStart;
                 err = (act->fRecording == NULL) ? Pa_StartStream(act->fStream) : paNoError;
                 if (err != paNoError) goto error;
+                act->fInterrupt = false;
                 for (;;)
                 {
                     SoundSnippet* sourceSnippet = &act->fData->fSnippets[act->fCmd.fCatIndex][act->fCmd.fSndIndex];
@@ -2729,7 +2774,6 @@ static void threadAudioChannelLoop(void* arg)
                     act->fDone = false;
                     act->fZeroPadCount = 0;
                     act->fSilenced = false;
-                    act->fInterrupt = false;
                     act->fNext = false;
                     StreamPlayTime(act, double(sourceAudio->samples[0].size()) / 44.1 * act->fCmd.fRatio);
                     if (act->fInterrupt)
@@ -2740,7 +2784,7 @@ static void threadAudioChannelLoop(void* arg)
                         act->fZeroPadCount = ~0;
                         // Pa_Sleep(random(40, 20));
                         act->fDone = true;
-                        while (!act->fSilenced)
+                        while (!act->fInterrupt && !act->fSilenced)
                         {
                             StreamPlayTime(act, 10);
                         }
