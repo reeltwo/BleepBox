@@ -864,13 +864,15 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
         // Check if we have any data to read from our stretcher
         if (act->fOutDataIndex < act->fOutDataAvail)
         {
-            // printf("[%d:%d] ", act->fOutDataIndex, act->fOutDataAvail);
+            printf("\r[%d:%d]", act->fOutDataIndex, act->fOutDataAvail);
             float val = act->fOutData[act->fOutDataIndex++];
             if (val > 1.f) val = 1.f;
             if (val < -1.f) val = -1.f;
             *out++ = act->fLastValue = val;
             // printf("%f ", val);
             act->fOutDataRead++;
+            if (act->fStretcher == NULL && act->fOutDataIndex == act->fOutDataAvail)
+                act->fNext = true;
             continue;
         }
         else if (act->fStretcher != NULL && (act->fOutDataAvail = act->fStretcher->available()) > 0)
@@ -1061,12 +1063,21 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
                 act->fStretcher = NULL;
             }
             dofinal = false;
-            act->fOutDataIndex = 0;
             act->fOutDataAvail = 0;
+            act->fOutDataIndex = 0;
             act->fOutDataRead = 0;
             act->fInDataWritten = 0;
             act->fNext = false;
-            act->fStretcher = wrapSnippet(sourceSnippet, ratio, pitchshift, frequencyshift);
+            if (ratio == 1 && pitchshift == 0 && frequencyshift == 1 && !act->fReverse)
+            {
+                // No need for a stretcher use raw data
+                act->fOutDataAvail = sampleEnd;
+                act->fOutData = &sourceAudio->samples[0][act->fSourceSoundIndex];
+            }
+            else
+            {
+                act->fStretcher = wrapSnippet(sourceSnippet, ratio, pitchshift, frequencyshift);
+            }
             // printf("noteCount : %d start : %d end : %d [%d] [note : %f \"%s\"]\n",
             //     sourceSnippet->fNoteCount,
             //     sourceSnippet->fNotes[0].fStartSampleTime,
@@ -1086,7 +1097,7 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
         }
 
         // Pump sourceAudio into stretcher
-        if (act->fSourceSoundIndex < sampleEnd)
+        if (act->fStretcher != NULL && act->fSourceSoundIndex < sampleEnd)
         {
             size_t countIn = 0;
             float* ibuf = (float*)act->fbuf;
@@ -1569,8 +1580,8 @@ void playRTTTLSequence(AudioChannelThread* act, const char *p, int octaveOffset)
             act->fMidiNote = 0;
             act->fZeroPadCount = ~0;
             act->fSourceSoundIndex = 0;
-            act->fOutDataIndex = 0;
             act->fOutDataAvail = 0;
+            act->fOutDataIndex = 0;
             act->fOutDataRead = 0;
             act->fInDataWritten = 0;
             act->fFadeOutValue = 0;
@@ -1598,8 +1609,8 @@ void playRTTTLSequence(AudioChannelThread* act, const char *p, int octaveOffset)
             }
             act->fZeroPadCount = 0;
             act->fSourceSoundIndex = 0;
-            act->fOutDataIndex = 0;
             act->fOutDataAvail = 0;
+            act->fOutDataIndex = 0;
             act->fOutDataRead = 0;
             act->fInDataWritten = 0;
             act->fFadeOutValue = 0;
@@ -2741,11 +2752,11 @@ static void threadAudioChannelLoop(void* arg)
         {
             case 1:
             {
-                act->fDone = false;
                 act->fZeroPadCount = 0;
                 act->fSilenced = false;
                 act->fInterrupt = false;
                 act->fNext = false;
+                act->fDone = false;
                 err = (act->fRecording == NULL) ? Pa_StartStream(act->fStream) : paNoError;
                 if (err != paNoError) goto error;
                 do
@@ -2753,10 +2764,19 @@ static void threadAudioChannelLoop(void* arg)
                     playRTTTLSequence(act, act->fCmd.fID, act->fCmd.fOctaveOffset);
                 }
                 while (!act->fInterrupt && act->fCmd.fLooping);
+                act->fDone = true;
                 err = (act->fRecording == NULL) ? Pa_StopStream(act->fStream) : paNoError;
                 free(act->fCmd.fID);
                 act->fCmd.fID = NULL;
                 act->fCmd.fCmd = 0;
+                if (act->fStretcher != NULL)
+                {
+                    if (act->fOutData != NULL)
+                        delete [] act->fOutData;
+                    delete act->fStretcher;
+                    act->fStretcher = NULL;
+                }
+                act->fOutDataAvail = 0;
                 if (err != paNoError) goto error;
                 break;
             }
@@ -2771,10 +2791,10 @@ static void threadAudioChannelLoop(void* arg)
                     SoundSnippet* sourceSnippet = &act->fData->fSnippets[act->fCmd.fCatIndex][act->fCmd.fSndIndex];
                     AudioFile<float>* sourceAudio = sourceSnippet->fAudio;
 
-                    act->fDone = false;
                     act->fZeroPadCount = 0;
                     act->fSilenced = false;
                     act->fNext = false;
+                    act->fDone = false;
                     StreamPlayTime(act, double(sourceAudio->samples[0].size()) / 44.1 * act->fCmd.fRatio);
                     if (act->fInterrupt)
                         break;
@@ -2801,11 +2821,19 @@ static void threadAudioChannelLoop(void* arg)
                 act->fCatIndex = 0;
                 act->fSnippetIndex = 0;
                 act->fRepeatSound = false;
-
+                act->fDone = true;
                 err = (act->fRecording == NULL) ? Pa_StopStream(act->fStream) : paNoError;
                 if (err != paNoError) goto error;
 
                 act->fCmd.fCmd = 0;
+                if (act->fStretcher != NULL)
+                {
+                    if (act->fOutData != NULL)
+                        delete [] act->fOutData;
+                    delete act->fStretcher;
+                    act->fStretcher = NULL;
+                }
+                act->fOutDataAvail = 0;
                 break;
             }
             case 3:
@@ -2814,7 +2842,6 @@ static void threadAudioChannelLoop(void* arg)
                 act->fInterrupt = false;
                 do
                 {
-                    act->fDone = false;
                     SF_INFO* sfinfo = &act->fCacheInfo;
                     memset(sfinfo, '\0', sizeof(*sfinfo));
                     if ((act->fCacheFile = sf_open(act->fCmd.fID, SFM_READ, sfinfo)) == NULL)
@@ -2835,6 +2862,7 @@ static void threadAudioChannelLoop(void* arg)
                         if (duration > 2)
                             duration = 0.5;
                     #endif
+                        act->fDone = false;
                         while (!act->fInterrupt && !act->fDone)
                         {
                             Pa_Sleep(duration * 1000);
@@ -2851,6 +2879,9 @@ static void threadAudioChannelLoop(void* arg)
                 while (!act->fInterrupt && act->fCmd.fLooping);
                 free(act->fCmd.fID);
                 act->fCacheFile = NULL;
+                if (act->fCacheMixDownBuffer != NULL)
+                    delete [] act->fCacheMixDownBuffer;
+                act->fCacheMixDownBuffer = NULL;
                 if (err != paNoError) goto error;
                 act->fCmd.fID = NULL;
                 act->fCmd.fCmd = 0;
