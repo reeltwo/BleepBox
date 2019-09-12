@@ -864,7 +864,7 @@ static int audioChannelCallback(const void *inputBuffer, void *outputBuffer, uns
         // Check if we have any data to read from our stretcher
         if (act->fOutDataIndex < act->fOutDataAvail)
         {
-            printf("\r[%d:%d]", act->fOutDataIndex, act->fOutDataAvail);
+            //printf("\r[%d:%d]", act->fOutDataIndex, act->fOutDataAvail);
             float val = act->fOutData[act->fOutDataIndex++];
             if (val > 1.f) val = 1.f;
             if (val < -1.f) val = -1.f;
