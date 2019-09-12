@@ -1,0 +1,3 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="7523", SYMLINK+="RSeriesBodyFirmware"
+SUBSYSTEM=="tty", ATTRS{interface}=="FT4232H-56Q MiniModule", ATTRS{bInterfaceNumber}=="00", SYMLINK+="VMusicSim"
+SUBSYSTEM=="tty", ATTRS{interface}=="FT4232H-56Q MiniModule", ATTRS{bInterfaceNumber}=="01", SYMLINK+="Stealth"
