@@ -2060,6 +2060,8 @@ void processCommand(GlobalState* data, char* line, bool verbose)
                 {
                     while (act->fCurrentCmd > 0 || (act->fCmd.fCmd != 0 && !act->fCmd.fDone))
                     {
+                        // end any looping action
+                        act->fCmd.fLooping = false;
                         Pa_Sleep(200);
                     }
                     memset(&act->fRecordingInfo, 0, sizeof (act->fRecordingInfo));
@@ -2966,6 +2968,11 @@ const char* amixerDevice = "Speaker";
 const char* amixerDevice = "PCM";
 #endif
 
+static bool sDriving;
+static bool sRandomChatter;
+static UInt64 sLastCmdMillis;
+static UInt64 sLastIdleMillis;
+
 static void MARC_eventHandler(const char* topic_name, const uint8_t* msg, size_t len, void* arg)
 {
     GlobalState* data = (GlobalState*)arg;
@@ -2987,6 +2994,11 @@ static void MARC_eventHandler(const char* topic_name, const uint8_t* msg, size_t
                         char* bleepcmd = strdup(marc->fCmd);
                         processCommand(data, bleepcmd, false);
                         free(bleepcmd);
+                        if (sRandomChatter && strncmp(marccmd, "$DOME", 5) != 0)
+                        {
+                            printf("Random chatter OFF\n");
+                            sRandomChatter = false;
+                        }
                         break;
                     }
                 }
@@ -3008,9 +3020,137 @@ static void MARC_eventHandler(const char* topic_name, const uint8_t* msg, size_t
                     system(cmdbuf);
                 }
             #endif
+                if (strcmp(marccmd, "$R") == 0)
+                {
+                    printf("Random chatter ON\n");
+                    sRandomChatter = true;
+                }
+                if (strcmp(marccmd, "$DRIVESTART") == 0)
+                {
+                    sDriving = true;
+                }
+                else if (strcmp(marccmd, "$DRIVESTOP") == 0)
+                {
+                    if (sDriving)
+                    {
+                        AudioChannelThread* act = &data->fChannels[0];
+                        if (act->fCmd.fLooping)
+                        {
+                            char* marcdup = strdup("$play #QUEUE,#LOOP,patrol");
+                            processCommand(data, marcdup, false);
+                            free(marcdup);
+                        }
+                    }
+                    sDriving = false;
+                }
+                sLastCmdMillis = CurrentTimeMillis();
             }
         }
         json_object_put(jobj);
+    }
+}
+
+static void MARC_idleTimer(void* arg)
+{
+    GlobalState* data = (GlobalState*)arg;
+    AudioChannelThread* act = &data->fChannels[0];
+    if (!sRandomChatter)
+        return;
+    if (sDriving)
+    {
+        if (sLastIdleMillis + 2000 < CurrentTimeMillis())
+        {
+            // Random chatter during driving
+            if (sLastCmdMillis + 10000 < CurrentTimeMillis()) 
+            {
+                if (!act->fCmd.fLooping && random(100) < 9)
+                {
+                    char* marcdup = strdup("$play #QUEUE,#LOOP,patrol");
+                    processCommand(data, marcdup, false);
+                    free(marcdup);
+                }
+                else if (!act->fCmd.fLooping && random(100) < 1)
+                {
+                    char* marcdup = strdup("$play #QUEUE,#LOOP,cylon-1");
+                    processCommand(data, marcdup, false);
+                    free(marcdup);
+                }
+                else if (random(100) < 1)
+                {
+                    char* marcdup;
+                    const char* cmds[] = {
+                        "$play rickastl",
+                        "$play rickastl",
+                        "$play SWmainSad",
+                        "$play rickastl",
+                        "$play SWmainFried",
+                        "$play rickastl",
+                        "$play SWmarchLowGoodFull",
+                        "$play rickastl",
+                        "$play SWmarchLowGoodFull2",
+                        "$play rickastl",
+                        "$play SWmainOkay",
+                        "$play rickastl",
+                        "$play rickastl",
+                        "$play rickastl"
+                    };
+                    marcdup = strdup(cmds[random(SizeOfArray(cmds))]);
+                    processCommand(data, marcdup, false);
+                    free(marcdup);
+                }
+                else if (random(100) < 2)
+                {
+                    char* marcdup = strdup("$play sad");
+                    processCommand(data, marcdup, false);
+                    free(marcdup);
+                }
+                else if (random(100) < 5)
+                {
+                    char* marcdup = strdup("$play happy");
+                    processCommand(data, marcdup, false);
+                    free(marcdup);
+                }
+                else if (random(100) < 25)
+                {
+                    char* marcdup = strdup("$play hum");
+                    processCommand(data, marcdup, false);
+                    free(marcdup);
+                }
+            }
+            sLastIdleMillis = CurrentTimeMillis();
+        }
+    }
+    else if (sLastIdleMillis + 7000 < CurrentTimeMillis())
+    {
+        // Random chatter during idle (wait 60 seconds from last command)
+        if (sLastCmdMillis + 30000 < CurrentTimeMillis())
+        {
+            if (random(100) < 5)
+            {
+                char* marcdup = strdup("$play gen");
+                processCommand(data, marcdup, false);
+                free(marcdup);
+            }
+            else if (random(100) < 10)
+            {
+                char* marcdup = strdup("$play whis");
+                processCommand(data, marcdup, false);
+                free(marcdup);
+            }
+            else if (random(100) < 20)
+            {
+                char* marcdup = strdup("$play whist");
+                processCommand(data, marcdup, false);
+                free(marcdup);
+            }
+            else if (random(100) < 25)
+            {
+                char* marcdup = strdup("$play chat");
+                processCommand(data, marcdup, false);
+                free(marcdup);
+            }
+        }
+        sLastIdleMillis = CurrentTimeMillis();
     }
 }
 
@@ -4242,6 +4382,11 @@ int main(int argc, const char* argv[])
             if (!smq_subscribe("MARC", MARC_eventHandler, &data))
             {
                 printf("Failed to subscribe to MARC event\n");
+                exit(-1);
+            }
+            if (!smq_timer(MARC_idleTimer, 1000, &data))
+            {
+                printf("Failed to create to MARC idle timer\n");
                 exit(-1);
             }
             if (!smq_advertise_hash("BLEEP"))
