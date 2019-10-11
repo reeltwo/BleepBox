@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DeviceProfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <ControlBoardTree>
+    <Nodes>
+      <Node Text="Battery Pack Parameters">
+        <Nodes>
+          <Node Text="Number of Cells" Value="6">
+            <Nodes />
+          </Node>
+          <Node Text="Cell Chemistry Type" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Nominal Capacity (Ah)" Value="66">
+            <Nodes />
+          </Node>
+          <Node Text="Max Charge Cycles" Value="1000">
+            <Nodes />
+          </Node>
+          <Node Text="Allowed Imbalance (mV)" Value="10">
+            <Nodes />
+          </Node>
+          <Node Text="Max Current on Discharge (A)" Value="50">
+            <Nodes />
+          </Node>
+          <Node Text="Max Current on Charge (A)" Value="3">
+            <Nodes />
+          </Node>
+          <Node Text="Cell Internal Resistance (mOhm)" Value="1">
+            <Nodes />
+          </Node>
+          <Node Text="Custom Chemistry Settings">
+            <Nodes>
+              <Node Text="Cell Nominal Voltage (mV)" Value="3200">
+                <Nodes />
+              </Node>
+              <Node Text="Cell High Limit (mV)" Value="3650">
+                <Nodes />
+              </Node>
+              <Node Text="Cell Low Limit (mV)" Value="2500">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="BMS Amps Limits">
+        <Nodes>
+          <Node Text="Load Currrent Limit">
+            <Nodes>
+              <Node Text="Overload Current (A)" Value="50">
+                <Nodes />
+              </Node>
+              <Node Text="Overload Trigger Delay (ms)" Value="5000">
+                <Nodes />
+              </Node>
+              <Node Text="Retry Delay (ms)" Value="5000">
+                <Nodes />
+              </Node>
+              <Node Text="Max Retries" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="Charge Currrent Limit">
+            <Nodes>
+              <Node Text="Charge Current (A)" Value="3">
+                <Nodes />
+              </Node>
+              <Node Text="Charge Trigger Delay (ms)" Value="5000">
+                <Nodes />
+              </Node>
+              <Node Text="Retry Delay (ms)" Value="5000">
+                <Nodes />
+              </Node>
+              <Node Text="Max Retries" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Temperature Limits">
+        <Nodes>
+          <Node Text="Sensor 1" Value="1">
+            <Nodes />
+          </Node>
+          <Node Text="Sensor 2" Value="1">
+            <Nodes />
+          </Node>
+          <Node Text="Discharge Max Temp (C)" Value="40">
+            <Nodes />
+          </Node>
+          <Node Text="Charge Max Temp (C)" Value="40">
+            <Nodes />
+          </Node>
+          <Node Text="Min Operating Temp (C)" Value="-10">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Short Circuit Protection" Value="1">
+        <Nodes />
+      </Node>
+      <Node Text="Switch Control Mode">
+        <Nodes>
+          <Node Text="Circuit Breaker">
+            <Nodes>
+              <Node Text="Pack" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="Load" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="Charge" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="AUX/Brake" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="Peripheral VCC">
+            <Nodes>
+              <Node Text="Bluetooth" Value="1">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="Balancing" Value="0">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Brake Output" Value="1">
+        <Nodes />
+      </Node>
+      <Node Text="Digital Inputs">
+        <Nodes>
+          <Node Text="DIn1" Value="">
+            <Nodes>
+              <Node Text="Action" Value="2">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="DIn2" Value="">
+            <Nodes>
+              <Node Text="Active Level" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="Action" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Digital Outputs">
+        <Nodes>
+          <Node Text="DOut1" Value="">
+            <Nodes>
+              <Node Text="Active Level" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="Activate when" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="DOut2" Value="">
+            <Nodes>
+              <Node Text="Active Level" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="Activate when" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Pulse Output" Value="0">
+        <Nodes />
+      </Node>
+      <Node Text="CAN">
+        <Nodes>
+          <Node Text="CAN Mode" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Bit Rate" Value="3">
+            <Nodes />
+          </Node>
+          <Node Text="Node ID" Value="6">
+            <Nodes />
+          </Node>
+          <Node Text="Listen Node ID" Value="4">
+            <Nodes />
+          </Node>
+          <Node Text="Heartbeat (ms)" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="MiniCAN Send Rate (ms)" Value="100">
+            <Nodes />
+          </Node>
+          <Node Text="CANOpen TPDO Send Rate">
+            <Nodes>
+              <Node Text="TPDO 1 Send Rate (ms)" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 2 Send Rate (ms)" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 3 Send Rate (ms)" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 4 Send Rate (ms)" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="CANOpen Transmission Type">
+            <Nodes>
+              <Node Text="TPDO 1 Transmission Type" Value="255">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 2 Transmission Type" Value="255">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 3 Transmission Type" Value="255">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 4 Transmission Type" Value="255">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="CANOpen Autostart" Value="0">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="RS485 (beta)">
+        <Nodes>
+          <Node Text="RS485 Communication" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="RS485 BaudRate" Value="0">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="ModBus (beta)">
+        <Nodes>
+          <Node Text="ModBus Mode" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="ModBus Slave ID" Value="1">
+            <Nodes />
+          </Node>
+          <Node Text="Data Alignment" Value="0">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Scripting">
+        <Nodes>
+          <Node Text="Script Auto-Start" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Script Output Port" Value="0">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="LED Indications" Value="1">
+        <Nodes />
+      </Node>
+    </Nodes>
+  </ControlBoardTree>
+  <PowerBoardTree>
+    <Nodes>
+      <Node Text="Battery Pack Parameters">
+        <Nodes>
+          <Node Text="Number of Cells" Value="15">
+            <Nodes />
+          </Node>
+          <Node Text="Cell Chemistry Type" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Nominal Capacity (Ah)" Value="500">
+            <Nodes />
+          </Node>
+          <Node Text="Max Charge Cycles" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Allowed Imbalance (mV)" Value="10">
+            <Nodes />
+          </Node>
+          <Node Text="Max Current on Discharge (A)" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Max Current on Charge (A)" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Cell Internal Resistance (mOhm)" Value="10000">
+            <Nodes />
+          </Node>
+          <Node Text="Custom Chemistry Settings">
+            <Nodes>
+              <Node Text="Cell Nominal Voltage (mV)" Value="3700">
+                <Nodes />
+              </Node>
+              <Node Text="Cell High Limit (mV)" Value="4200">
+                <Nodes />
+              </Node>
+              <Node Text="Cell Low Limit (mV)" Value="3000">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="BMS Amps Limits">
+        <Nodes>
+          <Node Text="Load Currrent Limit">
+            <Nodes>
+              <Node Text="Overload Current (A)" Value="100">
+                <Nodes />
+              </Node>
+              <Node Text="Overload Trigger Delay (ms)" Value="500">
+                <Nodes />
+              </Node>
+              <Node Text="Retry Delay (ms)" Value="1000">
+                <Nodes />
+              </Node>
+              <Node Text="Max Retries" Value="3">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="Charge Currrent Limit">
+            <Nodes>
+              <Node Text="Charge Current (A)" Value="30">
+                <Nodes />
+              </Node>
+              <Node Text="Charge Trigger Delay (ms)" Value="1000">
+                <Nodes />
+              </Node>
+              <Node Text="Retry Delay (ms)" Value="1000">
+                <Nodes />
+              </Node>
+              <Node Text="Max Retries" Value="3">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Temperature Limits">
+        <Nodes>
+          <Node Text="Sensor 1" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Sensor 2" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Discharge Max Temp (C)" Value="55">
+            <Nodes />
+          </Node>
+          <Node Text="Charge Max Temp (C)" Value="45">
+            <Nodes />
+          </Node>
+          <Node Text="Min Operating Temp (C)" Value="-10">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Short Circuit Protection" Value="1">
+        <Nodes />
+      </Node>
+      <Node Text="Switch Control Mode">
+        <Nodes>
+          <Node Text="Circuit Breaker">
+            <Nodes>
+              <Node Text="Pack" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="Load" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="Charge" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="AUX/Brake" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="Peripheral VCC">
+            <Nodes>
+              <Node Text="Bluetooth" Value="1">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="Balancing" Value="0">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Brake Output" Value="1">
+        <Nodes />
+      </Node>
+      <Node Text="Digital Inputs">
+        <Nodes>
+          <Node Text="Digital In1">
+            <Nodes>
+              <Node Text="Action" Value="2">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="Digital In2">
+            <Nodes>
+              <Node Text="Active Level" Value="0">
+                <Nodes />
+              </Node>
+              <Node Text="Action" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Digital Outputs">
+        <Nodes>
+          <Node Text="Digital Output 1">
+            <Nodes>
+              <Node Text="Active Level" Value="1">
+                <Nodes />
+              </Node>
+              <Node Text="Activate when" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="Digital Output 2">
+            <Nodes>
+              <Node Text="Active Level" Value="1">
+                <Nodes />
+              </Node>
+              <Node Text="Activate when" Value="0">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Pulse Output" Value="0">
+        <Nodes />
+      </Node>
+      <Node Text="CAN">
+        <Nodes>
+          <Node Text="CAN Mode" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Bit Rate" Value="4">
+            <Nodes />
+          </Node>
+          <Node Text="Node ID" Value="1">
+            <Nodes />
+          </Node>
+          <Node Text="Listen Node ID" Value="1">
+            <Nodes />
+          </Node>
+          <Node Text="Heartbeat (ms)" Value="1000">
+            <Nodes />
+          </Node>
+          <Node Text="MiniCAN Send Rate (ms)" Value="100">
+            <Nodes />
+          </Node>
+          <Node Text="CANOpen TPDO Send Rate">
+            <Nodes>
+              <Node Text="TPDO 1 Send Rate (ms)" Value="100">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 2 Send Rate (ms)" Value="100">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 3 Send Rate (ms)" Value="100">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 4 Send Rate (ms)" Value="100">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="CANOpen Transmission Type">
+            <Nodes>
+              <Node Text="TPDO 1 Transmission Type" Value="255">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 2 Transmission Type" Value="255">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 3 Transmission Type" Value="255">
+                <Nodes />
+              </Node>
+              <Node Text="TPDO 4 Transmission Type" Value="255">
+                <Nodes />
+              </Node>
+            </Nodes>
+          </Node>
+          <Node Text="CANOpen Autostart" Value="1">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="RS485 (beta)">
+        <Nodes>
+          <Node Text="RS485 Communication" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="RS485 BaudRate" Value="1">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="ModBus (beta)">
+        <Nodes>
+          <Node Text="ModBus Mode" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="ModBus Slave ID" Value="1">
+            <Nodes />
+          </Node>
+          <Node Text="Data Alignment" Value="0">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="Scripting">
+        <Nodes>
+          <Node Text="Script Auto-Start" Value="0">
+            <Nodes />
+          </Node>
+          <Node Text="Script Output Port" Value="0">
+            <Nodes />
+          </Node>
+        </Nodes>
+      </Node>
+      <Node Text="LED Indications" Value="1">
+        <Nodes />
+      </Node>
+    </Nodes>
+  </PowerBoardTree>
+</DeviceProfile>
